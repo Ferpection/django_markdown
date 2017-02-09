@@ -444,10 +444,14 @@
 					var newSelection = document.selection.createRange();
 					newSelection.text = block;
 				} else {
-					var event = document.createEvent('TextEvent');
-					if (event.initTextEvent) {
-						event.initTextEvent('textInput', true, true, null, block);
-						textarea.dispatchEvent(event); // fire the event on the the textarea
+					var isFirefox = typeof InstallTrigger !== 'undefined';
+					var isIE = /*@cc_on!@*/ false || !!document.documentMode;
+
+					if (!isFirefox && !isIE) {
+						jQuery(textarea).focus();
+						jQuery(textarea)[0].selectionStart = caretPosition;
+						jQuery(textarea)[0].selectionEnd = caretPosition + selection.length;
+						document.execCommand('insertText', false, block);
 					} else {
 						textarea.value =  textarea.value.substring(0, caretPosition)  + block + textarea.value.substring(caretPosition + selection.length, textarea.value.length);
 					}
